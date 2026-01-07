@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Workspace Saver",
+  "version": "1.0",
+  "description": "Save and restore tab sequences efficiently.",
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Save Tabs"
+  },
+  "icons": {
+    "128": "icon.png"
+  }
+}

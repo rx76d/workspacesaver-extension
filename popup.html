@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    :root {
+      --primary: #fa1e4e;
+      --bg: #ffffff;
+      --text: #333;
+      --border: #ddd;
+      --danger: #d32f2f;
+      --success: #388e3c;
+    }
+
+    html {
+      box-sizing: border-box;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+
+    body {
+      width: 350px;
+      /* Dynamic height: fits content but won't exceed 600px */
+      min-height: 150px; 
+      max-height: 600px;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--border);
+      background: #f8f9fa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    h3 { margin: 0; font-size: 15px; font-weight: 700; }
+    
+    .back-btn { display: none; cursor: pointer; border: none; background: transparent; font-size: 18px; padding: 0; color: #555; }
+    .back-btn:hover { color: var(--primary); }
+
+    /* SCROLL AREAS */
+    #main-view, #edit-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* INPUT GROUP */
+    .input-group { display: flex; gap: 8px; margin-bottom: 5px; }
+    input {
+      flex: 1; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; outline: none; font-size: 13px;
+    }
+    input:focus { border-color: var(--primary); }
+    button.primary-btn {
+      background: var(--primary); color: white; border: none; padding: 8px 15px;
+      border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px;
+      transition: background 0.2s;
+    }
+    button.primary-btn:hover { background: #d4143d; }
+
+    /* LIST ITEMS */
+    #workspace-list { margin-top: 15px; }
+    
+    .list-item {
+      background: white; border: 1px solid var(--border); margin-bottom: 8px;
+      padding: 8px 10px; border-radius: 6px; display: flex; align-items: center;
+      justify-content: space-between; transition: all 0.2s;
+      cursor: grab;
+    }
+    .list-item:hover { border-color: #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .list-item:active { cursor: grabbing; }
+    .list-item.locked { border-left: 3px solid var(--primary); background: #fff5f7; }
+    
+    .item-info { flex: 1; display: flex; align-items: center; gap: 10px; overflow: hidden; }
+    .item-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-meta { font-size: 11px; color: #888; margin-top: 2px; }
+
+    /* ACTION BUTTONS */
+    .actions { display: flex; gap: 2px; }
+    .btn-icon {
+      background: none; border: none; cursor: pointer; padding: 5px; color: #666;
+      border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s, background 0.2s;
+    }
+    .btn-icon:hover { background: #f0f0f0; color: var(--primary); }
+    .btn-icon svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* TOAST NOTIFICATION (Custom Alert) */
+    #toast {
+      visibility: hidden;
+      min-width: 200px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 10px;
+      position: fixed;
+      z-index: 200;
+      left: 50%;
+      bottom: 50px;
+      transform: translateX(-50%);
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    #toast.show { visibility: visible; opacity: 1; }
+    #toast.error { background-color: var(--danger); }
+    #toast.success { background-color: var(--success); }
+
+    /* MODAL */
+    #modal-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 100;
+      backdrop-filter: blur(2px);
+    }
+    .modal {
+      background: white; padding: 20px; border-radius: 8px; width: 85%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.2s ease;
+    }
+    @keyframes popIn { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+    
+    .modal-buttons { margin-top: 15px; display: flex; justify-content: flex-end; gap: 8px; }
+
+    /* FOOTER */
+    footer {
+      padding: 12px; border-top: 1px solid var(--border); font-size: 11px; color: #888;
+      text-align: center; background: #f8f9fa; flex-shrink: 0;
+    }
+    
+    .github-link { 
+      color: #333; text-decoration: none; font-weight: bold; 
+      cursor: pointer; display: inline-flex; align-items: center; gap: 5px; 
+      transition: color 0.2s;
+    }
+    
+    /* Strict selector to ensure SVG inherits color on hover */
+    .github-link:hover { color: var(--primary); }
+    .github-link svg { width: 14px; height: 14px; fill: currentColor; }
+    
+    /* UTILS */
+    .hidden { display: none !important; }
+    .sortable-ghost { opacity: 0.4; background: #eee; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <button id="backBtn" class="back-btn">
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </button>
+    <h3 id="viewTitle">My Workspaces</h3>
+    <div style="width: 20px;"></div>
+  </header>
+
+  <!-- MAIN VIEW -->
+  <div id="main-view">
+    <div class="input-group">
+      <input type="text" id="newWorkspaceName" placeholder="New Workspace Name..." autocomplete="off">
+      <button id="saveBtn" class="primary-btn">Save Tabs</button>
+    </div>
+    <div id="workspace-list"></div>
+  </div>
+
+  <!-- EDIT VIEW -->
+  <div id="edit-view" class="hidden">
+    <div class="input-group">
+      <input type="text" id="editWorkspaceName" placeholder="Rename Workspace..." autocomplete="off">
+      <button id="updateNameBtn" class="primary-btn">Rename</button>
+    </div>
+    <p style="font-size:11px; color:#888; margin:5px 0 10px 0; text-align:center;">Drag items to reorder tabs</p>
+    <div id="tab-list"></div>
+  </div>
+
+  <!-- PASSWORD MODAL -->
+  <div id="modal-overlay">
+    <div class="modal">
+      <h3 id="modalTitle">Security</h3>
+      <p id="modalDesc" style="font-size:13px; margin:10px 0; color:#555;">Enter password:</p>
+      <input type="password" id="modalInput" placeholder="Password">
+      <div class="modal-buttons">
+        <button id="modalCancel" class="btn-icon" style="border:1px solid #ccc; width:auto; padding:6px 12px; font-size:12px;">Cancel</button>
+        <button id="modalConfirm" class="primary-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast">Message</div>
+
+  <footer>
+    Developed by <span class="github-link" id="githubLink">rx76d
+      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+    </span>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>
