@@ -197,15 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
       enterEditMode(ws);
     }
     else if (action === 'delete') {
-      // Using a custom confirm modal would be best, but for brevity using simple confirm
-      // OR reuse the modal logic for yes/no. For now, simple standard confirm is safest for deletion
-      if (confirm(`Are you sure you want to delete "${ws.name}"?`)) {
+      showModal("Delete Workspace", `Are you sure you want to delete "${ws.name}"?`, () => {
         chrome.storage.local.get(['workspace_order'], (res) => {
           const newOrder = res.workspace_order.filter(id => id !== ws.id);
           chrome.storage.local.remove(ws.id);
           chrome.storage.local.set({ workspace_order: newOrder }, loadWorkspaces);
         });
-      }
+      }, false);
     }
     else if (action === 'toggleLock' && ws.locked) {
       ws.locked = false;
@@ -314,12 +312,19 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => { t.classList.remove('show'); }, 2500);
   }
 
-  function showModal(title, desc, callback) {
+  function showModal(title, desc, callback, showInput = true) {
     modalTitle.innerText = title;
     modalDesc.innerText = desc;
     modalInput.value = '';
+    
+    if (showInput) {
+      modalInput.classList.remove('hidden');
+      modalInput.focus();
+    } else {
+      modalInput.classList.add('hidden');
+    }
+    
     modalOverlay.style.display = 'flex';
-    modalInput.focus();
     modalCallback = callback;
   }
 

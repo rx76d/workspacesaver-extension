@@ -36,8 +36,7 @@ When working in a browser especially **Private/Incognito** window, closing the b
 
 ## 📸 Screenshot
 
-<img width="522" height="337" alt="Screenshot 2026-01-07 234446" src="https://github.com/user-attachments/assets/eaebe778-3e32-419f-bdb1-e374a2d47fb2" />
-
+img
 
 ---
 
