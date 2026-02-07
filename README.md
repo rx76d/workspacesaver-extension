@@ -1,6 +1,6 @@
 # Workspace Saver
 
-![Version](https://img.shields.io/badge/version-1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 **Never lose your browser worksapce again.**  
@@ -36,7 +36,8 @@ When working in a browser especially **Private/Incognito** window, closing the b
 
 ## 📸 Screenshot
 
-img
+<img width="522" height="337" alt="Screenshot 2026-01-07 234446" src="https://github.com/user-attachments/assets/d34ce274-b894-4733-935e-7671cd6ce6e7" />
+
 
 ---
 
