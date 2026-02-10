@@ -51,6 +51,10 @@ When working in a browser especially **Private/Incognito** window, closing the b
 
 ---
 
+## AI Usage
+
+I used AI to generate svg code in popup.js from line 25 to line 30.
+
 <div align="center">
 <sub>Developed by rx76d</sub>
 </div>
